@@ -323,12 +323,6 @@ Application = function () {
 
         createDefaultTexture();
 
-        floorModel = createFloorModel("models/floor/tilefloor_d.png", "models/floor/tilefloor_local.png", "models/floor/tilefloor_s.png");
-
-        impModel = loadModelMD5mesh("models/md5/imp/imp.md5mesh");
-        impAnims.push(loadMD5anim("models/md5/imp/idle1.md5anim"));
-//        impAnims.push(loadMD5anim("models/md5/imp/sight2.md5anim"));
-
         onCreateProgram = function (program) {
             program.attrib = {};
             program.attrib.pos = gl.getAttribLocation(program, "pos");
@@ -401,6 +395,12 @@ Application = function () {
             '#define HW_SKINNING\n' + '#include "shaders/skinning_matrix8.inc"\n' + '#include "shaders/lighting_vertex.inc"',
             '#define HALF_LAMBERT_DIFFUSE\n' + '#include "shaders/lighting_fragment.inc"',
             onCreateProgram));
+
+		floorModel = createFloorModel("models/floor/tilefloor_d.png", "models/floor/tilefloor_local.png", "models/floor/tilefloor_s.png");
+
+        impModel = loadModelMD5mesh("models/md5/imp/imp.md5mesh");
+        impAnims.push(loadMD5anim("models/md5/imp/idle1.md5anim"));
+//        impAnims.push(loadMD5anim("models/md5/imp/sight2.md5anim"));
 
         camera.origin = vec3.create([0, 0, 14]);
         camera.angles = vec3.create([15, 180, 0]);
