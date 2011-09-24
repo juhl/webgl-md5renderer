@@ -328,8 +328,6 @@ Application = function () {
 
         createDefaultTexture();
 
-<<<<<<< HEAD
-=======
         floorModel = createFloorModel("models/floor/tilefloor_d.png", "models/floor/tilefloor_local.png", "models/floor/tilefloor_s.png");
 
         //boxModel = createBoxModel("http://img2.generation-nt.com/webgl_00A5000000506751.jpg", "http://img2.generation-nt.com/webgl_00A5000000506751.jpg", "http://img2.generation-nt.com/webgl_00A5000000506751.jpg");
@@ -344,7 +342,6 @@ Application = function () {
         impAnims.push(loadMD5anim("models/md5/imp/idle1.md5anim"));
 //        impAnims.push(loadMD5anim("models/md5/imp/sight2.md5anim"));
 
->>>>>>> fixed error on windows caused by limits of vertex shader uniforms
         onCreateProgram = function (program) {
             program.attrib = {};
             program.attrib.pos = gl.getAttribLocation(program, "pos");
