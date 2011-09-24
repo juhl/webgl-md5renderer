@@ -12,6 +12,7 @@ Application = function () {
     var gl_maxTextureImageUnits = 0;
     var gl_maxVertexTextureImageUnits = 0;
     var gl_maxVertexUniformVectors = 0;
+    var gl_maxFragmentUniformVectors = 0;
 
     var requestAnimationFrameImpl;
     var getAnimationTimeImpl;
@@ -31,6 +32,8 @@ Application = function () {
 
     var floorModel;
     var boxModel;
+    var zombieModel;
+    var pinkyModel;
     var impModel;
     var impAnims = [];
 
@@ -74,7 +77,8 @@ Application = function () {
         gl_maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
         gl_maxTextureImageUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
         gl_maxVertexTextureImageUnits = gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-//        gl_maxVertexUniformVectors = gl.getParameter(gl.GL_MAX_VERTEX_UNIFORM_VECTORS);
+        gl_maxVertexUniformVectors = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+        gl_maxFragmentUniformVectors = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
     }
 
     function checkGLError(msg) {
@@ -102,7 +106,7 @@ Application = function () {
             break;
         }
 
-        alert("checkGLError: " + err_str + " on " + msg);
+        console.log("checkGLError: " + err_str + " on " + msg);
     }
 
     function getFrameMsec() {
@@ -273,13 +277,13 @@ Application = function () {
     function createProgram(text_vs, text_fs, oncreate) {
         var program = gl.createProgram();
 
-        program.vertexShader = createShader(gl.VERTEX_SHADER, text_vs);
+        program.vertexShader = createShader(gl.VERTEX_SHADER, "#ifdef GL_ES\nprecision mediump float;\n#endif\n" + text_vs);
         if (!program.vertexShader) {
             gl.deleteProgram(program);
             return null;
         }
-
-        program.fragmentShader = createShader(gl.FRAGMENT_SHADER, text_fs);
+       
+        program.fragmentShader = createShader(gl.FRAGMENT_SHADER, "#ifdef GL_ES\nprecision mediump float;\n#endif\n" + text_fs);
         if (!program.fragmentShader) {
             gl.deleteShader(program.vertexShader);
             gl.deleteProgram(program);
@@ -290,7 +294,7 @@ Application = function () {
         gl.attachShader(program, program.fragmentShader);
         gl.linkProgram(program);
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            alert("program link error:\n" + gl.getProgramInfoLog(program) + "\n\nvertex source:\n" + text_vs + "\n\nfragment source:\n" + text_fs);
+            alert("program link error:\n" + gl.getProgramInfoLog(program) + "\n\nvertex shader source:\n" + text_vs + "\n\nfragment shader source:\n" + text_fs);
             gl.deleteProgram(program);
             gl.deleteShader(program.vertexShader);
             gl.deleteShader(program.fragmentShader);
@@ -313,7 +317,8 @@ Application = function () {
         console.log("MAX_TEXTURE_SIZE: " + gl_maxTextureSize + "\n");
         console.log("MAX_TEXTURE_IMAGE_UNITS: " + gl_maxTextureImageUnits + "\n");
         console.log("MAX_VERTEX_TEXTURE_IMAGE_UNITS: " + gl_maxVertexTextureImageUnits + "\n");
-        //console.log("MAX_VERTEX_UNIFORM_VECTORS: " + gl_maxVertexUniformVectors + "\n");
+        console.log("MAX_VERTEX_UNIFORM_VECTORS: " + gl_maxVertexUniformVectors + "\n");
+        console.log("MAX_FRAGMENT_UNIFORM_VECTORS: " + gl_maxFragmentUniformVectors + "\n");
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0);
@@ -323,6 +328,23 @@ Application = function () {
 
         createDefaultTexture();
 
+<<<<<<< HEAD
+=======
+        floorModel = createFloorModel("models/floor/tilefloor_d.png", "models/floor/tilefloor_local.png", "models/floor/tilefloor_s.png");
+
+        //boxModel = createBoxModel("http://img2.generation-nt.com/webgl_00A5000000506751.jpg", "http://img2.generation-nt.com/webgl_00A5000000506751.jpg", "http://img2.generation-nt.com/webgl_00A5000000506751.jpg");
+/*
+        impModel = loadModelMD5mesh("models/md5/cyberdemon/cyberdemon.md5mesh");
+        impAnims.push(loadMD5anim("models/md5/cyberdemon/idle.md5anim"));
+        impAnims.push(loadMD5anim("models/md5/cyberdemon/sight.md5anim"));*/
+
+        //pinkyModel = loadModelMD5mesh("models/md5/pinky/pinky.md5mesh");
+
+        impModel = loadModelMD5mesh("models/md5/imp/imp.md5mesh");
+        impAnims.push(loadMD5anim("models/md5/imp/idle1.md5anim"));
+//        impAnims.push(loadMD5anim("models/md5/imp/sight2.md5anim"));
+
+>>>>>>> fixed error on windows caused by limits of vertex shader uniforms
         onCreateProgram = function (program) {
             program.attrib = {};
             program.attrib.pos = gl.getAttribLocation(program, "pos");
@@ -353,7 +375,7 @@ Application = function () {
                 program.uniform.joints[i] = gl.getUniformLocation(program, "joints[" + i + "]");*/
             program.uniform.joints = gl.getUniformLocation(program, "joints");
         };
-        
+
         depthProgram = createProgram(
             '#include "shaders/depth_vertex.inc"',
             '#include "shaders/depth_fragment.inc"', 
@@ -434,7 +456,7 @@ Application = function () {
         entity.skinningJoints = new Float32Array(entity.model.joints.length * 12);
         entity.time = Math.random() * 10;
         entity.runFrame = function (frametime) {
-	        this.time += frametime
+	        this.time += frametime;
 	        buildAnimFrame(impAnims[0], this.time, this.joints);
 	    };
     }
@@ -499,7 +521,7 @@ Application = function () {
 
         gl.flush();
 
-        checkGLError("updateScreen");
+        //checkGLError("updateScreen");
     }
 
     function updateSkinningJoints() {
@@ -942,7 +964,7 @@ Application = function () {
 
         mesh.dominantTris = new Array(mesh.numVerts);
 
-        // calc dominant (most large area) triangle for each vertex
+        // 각 버텍스 별로 dominant(가장 큰 면적의) triangle 을 구한다
 	    for (var i = 0; i < mesh.numVerts; i++) {
 	        var dominantTriArea = -1;
 	        var dominantTriVertex2 = -1;
@@ -953,7 +975,7 @@ Application = function () {
                     vec3.subtract(mesh.verts[mesh.indexes[j+1]].pos, mesh.verts[mesh.indexes[j]].pos, p0);
 		            vec3.subtract(mesh.verts[mesh.indexes[j+2]].pos, mesh.verts[mesh.indexes[j]].pos, p1);
 
-		            // calc triangle area
+		            // 삼각형 면적 구하기
 		            // var area = vec3.length(vec3.cross(p0, p1, vec)) / 2;
 		            var area = vec3.length(vec3.cross(p0, p1, vec));
 
@@ -1701,6 +1723,7 @@ Application = function () {
     }
 
     function main() {
+        //$("nav").hide().slideDown(400, function () {
         canvas = document.getElementById("canvas");
         
         $(canvas).mousedown(function (ev) {
@@ -1739,10 +1762,16 @@ Application = function () {
         init();
 
         lastFrameMsec = getFrameMsec();
-        runFrame();
+        runFrame(); 
+        //      });
     }
 
     return {
         main: main
     };
 }();
+
+// window.onload = Application.main;
+//$(document).ready(function () {
+//    Application.main();
+//})

@@ -1,6 +1,6 @@
 attribute float weightIndex0;
 
-uniform vec4 joints[768];		// 256 joints (4x3 matrix)
+uniform vec4 joints[246];		// 82 joints (4x3 matrix)
 
 void accumulateJointMatrices(out vec4 R0, out vec4 R1, out vec4 R2)
 {
